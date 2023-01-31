@@ -54,26 +54,23 @@ Object.keys(keyboardShortcut).forEach((key) => {
   ] = formatKey
 })
 
-export const isBlockActive = (
+export const getBlockActive = (
   editor: BaseEditor,
-  format: keyof typeof blockCommands
+  format: Array<keyof typeof blockCommands> | string[] = ['heading', 'quote']
 ) => {
   const { selection } = editor
-  // console.log('selection', selection)
   if (!selection) return false
   const [match] = Array.from(
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
       match: (n) => {
-        // console.log('n', n)
-        // console.log('isEditor', Editor.isEditor(n))
-        // console.log('isElement', Element.isElement(n))
-        return !Editor.isEditor(n) && Element.isElement(n) && n.type === format
+        return !Editor.isEditor(n) && Element.isElement(n) && n.type
+          ? format.includes(n.type)
+          : false
       },
     })
   )
-  // console.log('match', match)
-  return !!match
+  return match
 }
 export const isMarkActive = (
   editor: BaseEditor,
@@ -83,16 +80,19 @@ export const isMarkActive = (
   return marks ? !!marks[format] : false
 }
 
+export const getMarkActive = (editor: BaseEditor) => {
+  const marks = Editor.marks(editor)
+  return marks
+}
+
 export const toggleBlock = (
   editor: BaseEditor,
   format: keyof typeof blockCommands
 ) => {
-  const isActive = isBlockActive(editor, format)
-  // console.log('isActive', isActive)
+  const isActive = !!getBlockActive(editor, [format])
   const newProperties = {
     type: isActive ? blockCommands.paragraph : format,
   }
-  // console.log('newProperties', newProperties)
   Transforms.setNodes<Element>(editor, newProperties)
 }
 
@@ -105,6 +105,5 @@ export const toggleMark = (
     Editor.removeMark(editor, format)
   } else {
     Editor.addMark(editor, format, true)
-    // console.log(editor.marks) // debug marks value
   }
 }

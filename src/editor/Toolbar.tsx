@@ -1,15 +1,15 @@
 'use client'
 
-import { FormattedText } from '@/types'
+import { FormattedText, CustomElement } from '@/types'
 import clsx from 'clsx'
 import { Editor } from 'slate'
 import { useSlate } from 'slate-react'
 import {
   toggleMark,
-  isMarkActive,
-  isBlockActive,
+  getBlockActive,
   blockCommands,
   toggleBlock,
+  getMarkActive,
 } from './commands'
 
 export interface ActionEditorMark {
@@ -73,6 +73,11 @@ const Toolbar = () => {
   const editor = useSlate()
   const markExist = Editor.marks(editor)
   const renderMark = () => {
+    const activeBlockNode = getBlockActive(editor)
+    const activeBlockValue = activeBlockNode
+      ? (activeBlockNode[0] as CustomElement).type
+      : undefined
+    const activeMark = getMarkActive(editor)
     return listAction.map((item) => {
       if (item.type === 'mark') {
         return (
@@ -80,7 +85,7 @@ const Toolbar = () => {
             key={item.name}
             disabled={!markExist}
             className={clsx('btn', {
-              'btn-outline': !isMarkActive(editor, item.name),
+              'btn-outline': !activeMark?.[item.name],
             })}
             onMouseDown={(e) => {
               // prevent focus to button
@@ -98,7 +103,7 @@ const Toolbar = () => {
           <button
             key={item.name}
             className={clsx('btn', {
-              'btn-outline': !isBlockActive(editor, item.name),
+              'btn-outline': activeBlockValue !== item.name,
             })}
             onMouseDown={(e) => {
               e.preventDefault()

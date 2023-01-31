@@ -79,11 +79,7 @@ const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
 const Editor = () => {
   const [editor] = useState(() => withReact(createEditor()))
   return (
-    <Slate
-      editor={editor}
-      value={initialValue}
-      // onChange={(value) => console.log(value)}
-    >
+    <Slate editor={editor} value={initialValue}>
       <Toolbar></Toolbar>
       <div className="flex mt-4 shadow-lg h-full px-8 py-8 overflow-auto rounded-lg bg-white">
         <Editable
