@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createEditor, Descendant } from 'slate'
 import { Editable, RenderLeafProps, Slate, withReact } from 'slate-react'
 import keyEvent from './key-event'
+import Toolbar from './Toolbar'
 
 const initialValue: Descendant[] = [
   {
@@ -12,6 +13,8 @@ const initialValue: Descendant[] = [
   },
 ]
 const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
+  // TODO should be more safe when using match pattern rust like
+  /// suchipi/safety-match
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
@@ -40,19 +43,21 @@ const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
 const Editor = () => {
   const [editor] = useState(() => withReact(createEditor()))
   return (
-    <div className="flex mt-4 shadow-lg h-full px-8 py-8 overflow-auto rounded-lg bg-white">
-      <Slate
-        editor={editor}
-        value={initialValue}
-        // onChange={(value) => console.log(value)}
-      >
+    <Slate
+      editor={Object.assign(editor, { id: '1' })} // issue next.js 13
+      value={initialValue}
+      // onChange={(value) => console.log(value)}
+    >
+      <Toolbar></Toolbar>
+      <div className="flex mt-4 shadow-lg h-full px-8 py-8 overflow-auto rounded-lg bg-white">
         <Editable
+          autoFocus
           className="h-full w-full"
           renderLeaf={Leaf}
           onKeyDown={(event) => keyEvent(event, editor)}
         />
-      </Slate>
-    </div>
+      </div>
+    </Slate>
   )
 }
 export default Editor

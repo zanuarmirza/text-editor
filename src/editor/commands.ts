@@ -1,5 +1,5 @@
 import { FormattedText } from '@/types'
-import { Editor } from 'slate'
+import { BaseEditor, Editor } from 'slate'
 import { ReactEditor } from 'slate-react'
 
 export const blockCommands = {
@@ -9,7 +9,7 @@ export const blockCommands = {
 } as const
 
 export interface KeyPress {
-  info?: string
+  materialSymbol?: string
   shift?: boolean
   ctrl?: boolean
   key: string
@@ -21,28 +21,23 @@ export const keyboardShortcut: Record<
 > = {
   bold: {
     ctrl: true,
-    info: 'ctrl+b',
     key: 'b',
   },
   code: {
     ctrl: true,
-    info: 'ctrl+e',
     key: 'e',
   },
   italic: {
     ctrl: true,
-    info: 'ctrl+i',
     key: 'i',
   },
   strikethrough: {
     ctrl: true,
-    info: 'ctrl+shift+s',
     key: 's',
     shift: true,
   },
   underline: {
     ctrl: true,
-    info: 'ctrl+u',
     key: 'u',
   },
 }
@@ -60,8 +55,8 @@ Object.keys(keyboardShortcut).forEach((key) => {
   ] = formatKey
 })
 
-const isMarkActive = (
-  editor: ReactEditor,
+export const isMarkActive = (
+  editor: BaseEditor,
   format: keyof Omit<FormattedText, 'text'>
 ) => {
   const marks = Editor.marks(editor)
@@ -69,14 +64,14 @@ const isMarkActive = (
 }
 
 export const toggleBlock = (
-  editor: ReactEditor,
+  editor: BaseEditor,
   format: keyof typeof blockCommands
 ) => {
   console.log(editor, format)
 }
 
 export const toggleMark = (
-  editor: ReactEditor,
+  editor: BaseEditor,
   format: keyof Omit<FormattedText, 'text'>
 ) => {
   const isActive = isMarkActive(editor, format)
