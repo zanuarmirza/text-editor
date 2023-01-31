@@ -53,10 +53,9 @@ Object.keys(keyboardShortcut).forEach((key) => {
     })
   ] = formatKey
 })
-
-export const getBlockActive = (
+export const getBlock = (
   editor: BaseEditor,
-  format: Array<keyof typeof blockCommands> | string[] = ['heading', 'quote']
+  format: Array<keyof typeof blockCommands> | string
 ) => {
   const { selection } = editor
   if (!selection) return false
@@ -64,9 +63,19 @@ export const getBlockActive = (
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
       match: (n) => {
-        return !Editor.isEditor(n) && Element.isElement(n) && n.type
-          ? format.includes(n.type)
-          : false
+        if (Editor.isEditor(n)) {
+          return false
+        }
+        if (!Element.isElement(n)) {
+          return false
+        }
+        if (Array.isArray(format) && format.includes(n.type)) {
+          return true
+        }
+        if (n.type === format) {
+          return true
+        }
+        return false
       },
     })
   )
@@ -89,7 +98,7 @@ export const toggleBlock = (
   editor: BaseEditor,
   format: keyof typeof blockCommands
 ) => {
-  const isActive = !!getBlockActive(editor, [format])
+  const isActive = !!getBlock(editor, format)
   const newProperties = {
     type: isActive ? blockCommands.paragraph : format,
   }

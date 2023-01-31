@@ -1,12 +1,11 @@
 'use client'
 
-import { FormattedText, CustomElement } from '@/types'
+import { FormattedText, ModifierElement } from '@/types'
 import clsx from 'clsx'
-import { Editor } from 'slate'
 import { useSlate } from 'slate-react'
 import {
   toggleMark,
-  getBlockActive,
+  getBlock,
   blockCommands,
   toggleBlock,
   getMarkActive,
@@ -71,11 +70,14 @@ const listAction: ActionEditor[] = [
 
 const Toolbar = () => {
   const editor = useSlate()
-  const markExist = Editor.marks(editor)
+  const { selection } = editor
   const renderMark = () => {
-    const activeBlockNode = getBlockActive(editor)
-    const activeBlockValue = activeBlockNode
-      ? (activeBlockNode[0] as CustomElement).type
+    const nonParagraphBlockNode = getBlock(
+      editor,
+      Object.values(blockCommands).filter((item) => item !== 'paragraph')
+    )
+    const blockValue = nonParagraphBlockNode
+      ? (nonParagraphBlockNode[0] as ModifierElement).type
       : undefined
     const activeMark = getMarkActive(editor)
     return listAction.map((item) => {
@@ -83,7 +85,7 @@ const Toolbar = () => {
         return (
           <button
             key={item.name}
-            disabled={!markExist}
+            disabled={!selection}
             className={clsx('btn', {
               'btn-outline': !activeMark?.[item.name],
             })}
@@ -102,8 +104,9 @@ const Toolbar = () => {
         return (
           <button
             key={item.name}
+            disabled={!selection}
             className={clsx('btn', {
-              'btn-outline': activeBlockValue !== item.name,
+              'btn-outline': blockValue !== item.name,
             })}
             onMouseDown={(e) => {
               e.preventDefault()

@@ -4,6 +4,7 @@ import { HistoryEditor } from 'slate-history'
 import { blockCommands } from '@/editor/commands'
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor
 
+// default element
 export type ParagraphElement = {
   type: typeof blockCommands.paragraph
   children: CustomText[]
@@ -20,6 +21,7 @@ export type QuoteElement = {
 }
 
 export type CustomElement = ParagraphElement | HeadingElement | QuoteElement
+export type ModifierElement = HeadingElement | QuoteElement
 
 export type FormattedText = {
   text: string
