@@ -24,7 +24,6 @@ const ElementBlock = ({
   children,
   element,
 }: RenderElementProps) => {
-  console.log('element render', element, attributes)
   switch (element.type) {
     case 'heading':
       return (
@@ -55,7 +54,10 @@ const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
 
   if (leaf.code) {
     children = (
-      <code className="text-red-500 bg-gray-800 rounded-sm px-1 py-0.5 text-sm">
+      <code
+        className="text-red-500 bg-gray-800 rounded-sm px-1 py-0.5"
+        style={{ fontSize: '85%' }}
+      >
         {children}
       </code>
     )
@@ -80,7 +82,7 @@ const Editor = () => {
     <Slate
       editor={editor}
       value={initialValue}
-      onChange={(value) => console.log(value)}
+      // onChange={(value) => console.log(value)}
     >
       <Toolbar></Toolbar>
       <div className="flex mt-4 shadow-lg h-full px-8 py-8 overflow-auto rounded-lg bg-white">
