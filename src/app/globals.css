@@ -11,6 +11,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-size: 10px;
 }
+/* editor doesn't have font-size system, so it's okay to scale down the font size for readability (it mean not too large on small device)*/
 @screen md {
   body {
     font-size: 16px;

@@ -2,7 +2,13 @@
 
 import { useState } from 'react'
 import { createEditor, Descendant } from 'slate'
-import { Editable, RenderLeafProps, Slate, withReact } from 'slate-react'
+import {
+  Editable,
+  RenderElementProps,
+  RenderLeafProps,
+  Slate,
+  withReact,
+} from 'slate-react'
 import keyEvent from './key-event'
 import Toolbar from './Toolbar'
 
@@ -12,6 +18,34 @@ const initialValue: Descendant[] = [
     children: [{ text: 'type here to start your awesome text editor' }],
   },
 ]
+
+const ElementBlock = ({
+  attributes,
+  children,
+  element,
+}: RenderElementProps) => {
+  console.log('element render', element, attributes)
+  switch (element.type) {
+    case 'heading':
+      return (
+        <h1 className="text-3xl" {...attributes}>
+          {children}
+        </h1>
+      )
+    case 'quote':
+      return (
+        <blockquote
+          className="p-4 my-4 border-l-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800"
+          {...attributes}
+        >
+          {children}
+        </blockquote>
+      )
+    default:
+      return <p {...attributes}>{children}</p>
+  }
+}
+
 const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
   // TODO should be more safe when using match pattern rust like
   /// suchipi/safety-match
@@ -44,9 +78,9 @@ const Editor = () => {
   const [editor] = useState(() => withReact(createEditor()))
   return (
     <Slate
-      editor={Object.assign(editor, { id: '1' })} // issue next.js 13
+      editor={editor}
       value={initialValue}
-      // onChange={(value) => console.log(value)}
+      onChange={(value) => console.log(value)}
     >
       <Toolbar></Toolbar>
       <div className="flex mt-4 shadow-lg h-full px-8 py-8 overflow-auto rounded-lg bg-white">
@@ -54,6 +88,7 @@ const Editor = () => {
           autoFocus
           className="h-full w-full"
           renderLeaf={Leaf}
+          renderElement={ElementBlock}
           onKeyDown={(event) => keyEvent(event, editor)}
         />
       </div>

@@ -11,7 +11,6 @@ export type ParagraphElement = {
 
 export type HeadingElement = {
   type: typeof blockCommands.heading
-  level: number
   children: CustomText[]
 }
 

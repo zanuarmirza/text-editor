@@ -1,6 +1,5 @@
 import { FormattedText } from '@/types'
-import { BaseEditor, Editor } from 'slate'
-import { ReactEditor } from 'slate-react'
+import { BaseEditor, Editor, Element, Transforms } from 'slate'
 
 export const blockCommands = {
   paragraph: 'paragraph',
@@ -55,6 +54,27 @@ Object.keys(keyboardShortcut).forEach((key) => {
   ] = formatKey
 })
 
+export const isBlockActive = (
+  editor: BaseEditor,
+  format: keyof typeof blockCommands
+) => {
+  const { selection } = editor
+  // console.log('selection', selection)
+  if (!selection) return false
+  const [match] = Array.from(
+    Editor.nodes(editor, {
+      at: Editor.unhangRange(editor, selection),
+      match: (n) => {
+        // console.log('n', n)
+        // console.log('isEditor', Editor.isEditor(n))
+        // console.log('isElement', Element.isElement(n))
+        return !Editor.isEditor(n) && Element.isElement(n) && n.type === format
+      },
+    })
+  )
+  console.log('match', match)
+  return !!match
+}
 export const isMarkActive = (
   editor: BaseEditor,
   format: keyof Omit<FormattedText, 'text'>
@@ -67,7 +87,13 @@ export const toggleBlock = (
   editor: BaseEditor,
   format: keyof typeof blockCommands
 ) => {
-  console.log(editor, format)
+  const isActive = isBlockActive(editor, format)
+  // console.log('isActive', isActive)
+  const newProperties = {
+    type: isActive ? blockCommands.paragraph : format,
+  }
+  // console.log('newProperties', newProperties)
+  Transforms.setNodes<Element>(editor, newProperties)
 }
 
 export const toggleMark = (
